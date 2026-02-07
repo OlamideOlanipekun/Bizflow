@@ -42,11 +42,11 @@ const StatCard: React.FC<{
   sparklineColor: string;
   isPositive?: boolean;
 }> = ({ title, value, change, icon, color, sparklineData, sparklineColor, isPositive = true }) => (
-  <div className="bg-white p-8 rounded-[3rem] shadow-sm border border-slate-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group overflow-hidden relative">
+  <div className="bg-white p-6 sm:p-8 rounded-[2.5rem] sm:rounded-[3rem] shadow-sm border border-slate-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group overflow-hidden relative">
     <div className="flex justify-between items-start relative z-10">
       <div>
-        <p className="text-slate-400 text-[11px] font-black uppercase tracking-[0.2em] mb-3">{title}</p>
-        <h3 className="text-4xl font-black text-slate-900 tracking-tighter">{value}</h3>
+        <p className="text-slate-400 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] mb-2 sm:mb-3">{title}</p>
+        <h3 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter">{value}</h3>
       </div>
       <div className={`p-5 rounded-2xl ${color} transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg shadow-slate-200/50`}>
         {icon}
@@ -178,8 +178,8 @@ const Dashboard: React.FC = () => {
           <div className="h-4 w-32 bg-slate-200 rounded-full"></div>
           <div className="h-16 w-[450px] bg-slate-200 rounded-3xl"></div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
-          {[1, 2, 3, 4].map(i => <div key={i} className="h-56 bg-slate-200 rounded-[3rem]"></div>)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-10">
+          {[1, 2, 3, 4].map(i => <div key={i} className="h-48 sm:h-56 bg-slate-200 rounded-[2.5rem] sm:rounded-[3rem]"></div>)}
         </div>
         <div className="h-[600px] bg-slate-200 rounded-[4rem]"></div>
       </div>

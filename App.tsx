@@ -61,7 +61,7 @@ const Sidebar: React.FC<{ user: User | null; onLogout: () => void; isOpen: boole
         />
       )}
 
-      <div className={`w-72 bg-slate-950 text-white h-screen fixed left-0 top-0 flex flex-col z-50 transition-transform duration-300 shadow-2xl border-r border-white/5 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      <div className={`w-80 bg-slate-950 text-white h-screen fixed left-0 top-0 flex flex-col z-50 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] shadow-[0_0_50px_rgba(0,0,0,0.5)] border-r border-white/5 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}>
         <div className="p-8 flex items-center justify-between">
           <Link to="/" className="flex items-center justify-between bg-white/5 border border-white/10 p-4 rounded-[1.5rem] cursor-pointer hover:bg-white/10 transition-all group flex-1">
@@ -227,7 +227,7 @@ const Layout: React.FC<{ user: User | null; onLogout: () => void; children: Reac
       <Sidebar user={user} onLogout={onLogout} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <Navbar user={user} onOpenSidebar={() => setIsSidebarOpen(true)} />
       <main className="lg:ml-72 pt-20 min-h-screen transition-all">
-        <div className="p-4 sm:p-6 lg:p-12">
+        <div className="p-4 sm:p-8 lg:p-12 max-w-[1600px] mx-auto">
           {children}
         </div>
       </main>
