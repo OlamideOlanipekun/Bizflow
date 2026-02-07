@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { AuthState, User } from './types';
-import { api } from './services/mockApi';
+import { api } from './services/api';
 import { ICONS } from './constants';
 
 // Pages
@@ -14,9 +14,12 @@ import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import Auth from './pages/Auth';
 import SignUp from './pages/SignUp';
+import AdminDashboard from './pages/Admin/AdminDashboard';
+import UserManager from './pages/Admin/UserManager';
 
 const Sidebar: React.FC<{ user: User | null; onLogout: () => void; isOpen: boolean; onClose: () => void }> = ({ user, onLogout, isOpen, onClose }) => {
   const location = useLocation();
+  const isAdmin = user?.role === 'admin';
 
   const sections = [
     {
@@ -33,6 +36,13 @@ const Sidebar: React.FC<{ user: User | null; onLogout: () => void; isOpen: boole
         { label: 'Transactions', path: '/app/transactions', icon: ICONS.Transactions, badge: 3 },
       ]
     },
+    ...(isAdmin ? [{
+      title: 'Administration',
+      items: [
+        { label: 'Admin Console', path: '/app/admin', icon: ICONS.Shield },
+        { label: 'Entity Directory', path: '/app/admin/users', icon: ICONS.Customers },
+      ]
+    }] : []),
     {
       title: 'Configuration',
       items: [
@@ -45,15 +55,14 @@ const Sidebar: React.FC<{ user: User | null; onLogout: () => void; isOpen: boole
     <>
       {/* Backdrop for mobile */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 lg:hidden transition-opacity"
           onClick={onClose}
         />
       )}
-      
-      <div className={`w-72 bg-slate-950 text-white h-screen fixed left-0 top-0 flex flex-col z-50 transition-transform duration-300 shadow-2xl border-r border-white/5 ${
-        isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-      }`}>
+
+      <div className={`w-72 bg-slate-950 text-white h-screen fixed left-0 top-0 flex flex-col z-50 transition-transform duration-300 shadow-2xl border-r border-white/5 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        }`}>
         <div className="p-8 flex items-center justify-between">
           <Link to="/" className="flex items-center justify-between bg-white/5 border border-white/10 p-4 rounded-[1.5rem] cursor-pointer hover:bg-white/10 transition-all group flex-1">
             <div className="flex items-center gap-3 overflow-hidden">
@@ -73,7 +82,7 @@ const Sidebar: React.FC<{ user: User | null; onLogout: () => void; isOpen: boole
             </svg>
           </button>
         </div>
-        
+
         <nav className="flex-1 px-5 py-2 space-y-8 overflow-y-auto custom-scrollbar">
           {sections.map((section) => (
             <div key={section.title}>
@@ -86,21 +95,19 @@ const Sidebar: React.FC<{ user: User | null; onLogout: () => void; isOpen: boole
                       key={item.path}
                       to={item.path}
                       onClick={() => { if (window.innerWidth < 1024) onClose(); }}
-                      className={`group relative flex items-center justify-between px-5 py-3.5 rounded-2xl transition-all duration-300 ${
-                        isActive 
-                          ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-900/20' 
-                          : 'text-slate-400 hover:bg-white/5 hover:text-white'
-                      }`}
+                      className={`group relative flex items-center justify-between px-5 py-3.5 rounded-2xl transition-all duration-300 ${isActive
+                        ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-900/20'
+                        : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                        }`}
                     >
                       <div className="flex items-center gap-4 transition-transform duration-300 group-hover:translate-x-1">
                         <item.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-indigo-400'}`} />
                         <span className={`font-bold text-sm tracking-tight ${isActive ? 'text-white' : ''}`}>{item.label}</span>
                       </div>
-                      
+
                       {item.badge && (
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-                          isActive ? 'bg-indigo-50 text-white' : 'bg-indigo-500/20 text-indigo-400'
-                        }`}>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${isActive ? 'bg-indigo-50 text-white' : 'bg-indigo-500/20 text-indigo-400'
+                          }`}>
                           {item.badge}
                         </span>
                       )}
@@ -117,7 +124,9 @@ const Sidebar: React.FC<{ user: User | null; onLogout: () => void; isOpen: boole
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <img src={user?.avatar} alt="Avatar" className="w-11 h-11 rounded-2xl border-2 border-white/10 bg-slate-800 object-cover" />
+                  <div className="w-11 h-11 rounded-2xl border-2 border-white/10 bg-indigo-600 flex items-center justify-center font-black text-white">
+                    {user?.name?.[0]}
+                  </div>
                   <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-slate-950 rounded-full"></div>
                 </div>
                 <div className="overflow-hidden text-left">
@@ -126,7 +135,7 @@ const Sidebar: React.FC<{ user: User | null; onLogout: () => void; isOpen: boole
                 </div>
               </div>
             </div>
-            
+
             <button
               onClick={onLogout}
               className="flex items-center justify-center gap-3 w-full px-5 py-3 text-slate-400 hover:text-rose-400 hover:bg-rose-400/10 rounded-2xl transition-all font-black text-[10px] uppercase tracking-widest border border-white/5 hover:border-rose-400/20"
@@ -156,7 +165,7 @@ const Navbar: React.FC<{ user: User | null; onOpenSidebar: () => void }> = ({ us
   return (
     <header className="h-20 bg-white/70 backdrop-blur-2xl border-b border-slate-100 fixed top-0 left-0 lg:left-72 right-0 z-40 flex items-center justify-between px-6 lg:px-10 transition-all duration-300">
       <div className="flex items-center gap-4 lg:gap-8 flex-1">
-        <button 
+        <button
           onClick={onOpenSidebar}
           className="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-xl transition-colors"
         >
@@ -165,28 +174,27 @@ const Navbar: React.FC<{ user: User | null; onOpenSidebar: () => void }> = ({ us
           </svg>
         </button>
 
-        <div className={`flex items-center bg-slate-100/60 border border-slate-200/50 rounded-2xl px-5 py-2.5 transition-all duration-300 ${
-          isSearchFocused ? 'w-full lg:w-[550px] bg-white ring-4 ring-indigo-500/5 border-indigo-500/30' : 'w-full max-w-[450px]'
-        }`}>
+        <div className={`flex items-center bg-slate-100/60 border border-slate-200/50 rounded-2xl px-5 py-2.5 transition-all duration-300 ${isSearchFocused ? 'w-full lg:w-[550px] bg-white ring-4 ring-indigo-500/5 border-indigo-500/30' : 'w-full max-w-[450px]'
+          }`}>
           <ICONS.Search className={`w-4 h-4 mr-3 transition-colors ${isSearchFocused ? 'text-indigo-500' : 'text-slate-400'}`} />
-          <input 
-            type="text" 
+          <input
+            type="text"
             onFocus={() => setIsSearchFocused(true)}
             onBlur={() => setIsSearchFocused(false)}
-            placeholder="Search records (⌘K)..." 
+            placeholder="Search records (⌘K)..."
             className="bg-transparent border-none outline-none text-sm w-full text-slate-800 placeholder-slate-400 font-bold"
           />
           <div className="hidden sm:flex items-center gap-1 ml-2">
-             <kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-[9px] font-black text-slate-400">⌘</kbd>
-             <kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-[9px] font-black text-slate-400">K</kbd>
+            <kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-[9px] font-black text-slate-400">⌘</kbd>
+            <kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-[9px] font-black text-slate-400">K</kbd>
           </div>
         </div>
-        
+
         <div className="hidden xl:flex items-center gap-3 px-4 py-2 bg-indigo-50/50 rounded-full border border-indigo-100/50">
-           <div className={`w-2 h-2 rounded-full ${isSyncing ? 'bg-indigo-500 animate-pulse' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'}`}></div>
-           <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
-             {isSyncing ? 'Syncing...' : 'Stable'}
-           </span>
+          <div className={`w-2 h-2 rounded-full ${isSyncing ? 'bg-indigo-500 animate-pulse' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'}`}></div>
+          <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+            {isSyncing ? 'Syncing...' : 'Stable'}
+          </span>
         </div>
       </div>
 
@@ -204,7 +212,7 @@ const Navbar: React.FC<{ user: User | null; onOpenSidebar: () => void }> = ({ us
         </button>
 
         <button className="flex items-center justify-center p-2 lg:p-3 bg-slate-900 text-white rounded-2xl hover:bg-indigo-600 hover:-translate-y-0.5 transition-all shadow-lg shadow-slate-200 group">
-           <ICONS.Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+          <ICONS.Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
         </button>
       </div>
     </header>
@@ -235,16 +243,30 @@ const App: React.FC = () => {
   });
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('bizflow_user');
-    if (savedUser) {
-      setAuth({
-        user: JSON.parse(savedUser),
-        isAuthenticated: true,
-        isLoading: false,
-      });
-    } else {
-      setAuth(prev => ({ ...prev, isLoading: false }));
-    }
+    const initAuth = async () => {
+      const savedUser = localStorage.getItem('bizflow_user');
+      if (savedUser) {
+        try {
+          // Verify token with backend
+          const userData = await api.getMe();
+          const user = { ...JSON.parse(savedUser), ...userData };
+          setAuth({
+            user,
+            isAuthenticated: true,
+            isLoading: false,
+          });
+          localStorage.setItem('bizflow_user', JSON.stringify(user));
+        } catch (err) {
+          console.error('Auth verification failed:', err);
+          localStorage.removeItem('bizflow_user');
+          setAuth({ user: null, isAuthenticated: false, isLoading: false });
+        }
+      } else {
+        setAuth(prev => ({ ...prev, isLoading: false }));
+      }
+    };
+
+    initAuth();
   }, []);
 
   const handleLogin = async (email: string, pass: string) => {
@@ -254,7 +276,7 @@ const App: React.FC = () => {
       setAuth({ user, isAuthenticated: true, isLoading: false });
     } catch (err) {
       console.error(err);
-      alert('Login failed. Ensure credentials match the environment settings.');
+      throw err; // Rethrow so Auth.tsx can catch and show error in UI
     }
   };
 
@@ -265,7 +287,7 @@ const App: React.FC = () => {
       setAuth({ user, isAuthenticated: true, isLoading: false });
     } catch (err) {
       console.error(err);
-      alert('Sign up failed.');
+      throw err;
     }
   };
 
@@ -281,7 +303,7 @@ const App: React.FC = () => {
           <div className="relative">
             <div className="animate-spin rounded-full h-24 w-24 border-t-4 border-b-4 border-indigo-500"></div>
             <div className="absolute inset-0 flex items-center justify-center">
-               <div className="w-8 h-8 bg-indigo-600 rounded-xl animate-pulse"></div>
+              <div className="w-8 h-8 bg-indigo-600 rounded-xl animate-pulse"></div>
             </div>
           </div>
           <div className="text-center space-y-2">
@@ -297,13 +319,13 @@ const App: React.FC = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Landing isAuthenticated={auth.isAuthenticated} />} />
-        <Route 
-          path="/login" 
-          element={!auth.isAuthenticated ? <Auth onLogin={handleLogin} /> : <Navigate to="/app" />} 
+        <Route
+          path="/login"
+          element={!auth.isAuthenticated ? <Auth onLogin={handleLogin} /> : <Navigate to="/app" />}
         />
-        <Route 
-          path="/signup" 
-          element={!auth.isAuthenticated ? <SignUp onSignUp={handleSignUp} /> : <Navigate to="/app" />} 
+        <Route
+          path="/signup"
+          element={!auth.isAuthenticated ? <SignUp onSignUp={handleSignUp} /> : <Navigate to="/app" />}
         />
         <Route
           path="/app/*"
@@ -316,6 +338,15 @@ const App: React.FC = () => {
                   <Route path="/transactions" element={<Transactions />} />
                   <Route path="/reports" element={<Reports />} />
                   <Route path="/settings" element={<Settings />} />
+
+                  {/* Admin Routes */}
+                  {auth.user?.role === 'admin' && (
+                    <>
+                      <Route path="/admin" element={<AdminDashboard />} />
+                      <Route path="/admin/users" element={<UserManager />} />
+                    </>
+                  )}
+
                   <Route path="*" element={<Navigate to="/app" />} />
                 </Routes>
               </Layout>

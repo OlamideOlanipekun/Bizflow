@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 import { ICONS } from '../constants';
 
 const Auth: React.FC<{ onLogin: (email: string, pass: string) => Promise<void> }> = ({ onLogin }) => {
-  const [email, setEmail] = useState('admin@bizflow.io');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loginStep, setLoginStep] = useState<'idle' | 'verifying' | 'authorizing'>('idle');
@@ -18,154 +18,168 @@ const Auth: React.FC<{ onLogin: (email: string, pass: string) => Promise<void> }
     setLoginStep('verifying');
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 800));
       setLoginStep('authorizing');
       await onLogin(email, password);
-    } catch (err) {
-      setError('Invalid identity credentials. Access denied by protocol.');
+    } catch (err: any) {
+      setError(err.message || 'Invalid identity credentials. Access denied by protocol.');
       setLoginStep('idle');
       setIsLoggingIn(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-white selection:bg-indigo-100 selection:text-indigo-900">
-      
+    <div className="min-h-screen flex flex-col lg:flex-row mesh-gradient-bg selection:bg-indigo-500/30 selection:text-white overflow-hidden">
+
       {/* Left Side: Brand Experience Zone */}
-      <div className="hidden lg:flex lg:w-1/2 bg-slate-950 relative overflow-hidden flex-col justify-between p-20">
-        {/* Abstract Background Elements */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:40px_40px]"></div>
+      <div className="hidden lg:flex lg:w-3/5 relative flex-col justify-between p-16 xl:p-24 overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px] animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-sky-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
         </div>
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[160px]"></div>
 
         {/* Brand Header */}
         <Link to="/" className="relative z-10 flex items-center gap-4 group">
-          <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-2xl shadow-indigo-600/40 group-hover:scale-110 transition-transform">B</div>
-          <span className="text-2xl font-black tracking-tighter text-white">BizFlow</span>
+          <div className="w-14 h-14 glass-effect rounded-2xl flex items-center justify-center text-white font-black text-2xl group-hover:scale-110 transition-transform duration-500">B</div>
+          <span className="text-3xl font-black tracking-tighter text-white">BizFlow<span className="text-indigo-400">.</span></span>
         </Link>
 
         {/* Content & Visual */}
-        <div className="relative z-10 space-y-12 max-w-lg">
+        <div className="relative z-10 space-y-12 max-w-2xl mt-12">
           <div className="space-y-6">
-            <h2 className="text-6xl font-black text-white tracking-tighter leading-[0.9]">
-              Secure the <br />
-              <span className="text-indigo-400">Command Chain.</span>
+            <h2 className="text-7xl xl:text-8xl font-black text-white tracking-tighter leading-[0.85] shimmer-text">
+              Lead With <br />
+              <span className="text-indigo-400">Intelligence.</span>
             </h2>
-            <p className="text-xl text-slate-400 font-medium leading-relaxed">
-              Log in to the high-velocity ecosystem designed for modern executive leadership.
+            <p className="text-xl text-slate-400 font-medium leading-relaxed max-w-md">
+              Secure access to your executive dashboard. Modern business logic meets AI-driven strategic pivots.
             </p>
           </div>
 
-          {/* Floating Feature Card */}
-          <div className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-8 shadow-2xl animate-float">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">System Trace v2.4</span>
+          {/* Bento-style Feature Deck */}
+          <div className="grid grid-cols-2 gap-6 relative">
+            <div className="glass-effect rounded-[2.5rem] p-8 space-y-4 hover:translate-y-[-4px] transition-transform duration-500">
+              <div className="w-10 h-10 bg-indigo-500/20 rounded-xl flex items-center justify-center">
+                <ICONS.Sparkles className="w-5 h-5 text-indigo-400" />
               </div>
-              <ICONS.Sparkles className="w-5 h-5 text-indigo-400" />
+              <div>
+                <h4 className="text-white font-bold">Generative Insights</h4>
+                <p className="text-xs text-slate-500 mt-1">Real-time market analysis powered by Gemini 1.5 Pro.</p>
+              </div>
             </div>
-            <div className="space-y-6">
-              <div className="flex items-end gap-2">
-                <div className="flex-1 bg-white/10 rounded-t-xl h-12"></div>
-                <div className="flex-1 bg-indigo-500 rounded-t-xl h-24 shadow-lg shadow-indigo-500/20"></div>
-                <div className="flex-1 bg-white/10 rounded-t-xl h-16"></div>
-                <div className="flex-1 bg-white/10 rounded-t-xl h-20"></div>
+            <div className="glass-effect rounded-[2.5rem] p-8 space-y-4 hover:translate-y-[-4px] transition-transform duration-500" style={{ transitionDelay: '0.1s' }}>
+              <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+                <ICONS.Bolt className="w-5 h-5 text-emerald-400" />
               </div>
-              <div className="flex justify-between items-center">
-                 <p className="text-sm font-black text-white">Projected Growth</p>
-                 <p className="text-sm font-black text-emerald-400">+24.8%</p>
+              <div>
+                <h4 className="text-white font-bold">High Velocity</h4>
+                <p className="text-xs text-slate-500 mt-1">Instant sync across all your global business nodes.</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Footer Meta */}
-        <div className="relative z-10 flex items-center gap-8 opacity-40">
-           <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">TLS 1.3 Certified</span>
-           <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">ISO 27001 Ready</span>
-           <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">SLA 99.99%</span>
+        <div className="relative z-10 flex items-center gap-10">
+          <div className="flex -space-x-3">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="w-8 h-8 rounded-full border-2 border-slate-900 bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-500">
+                USR
+              </div>
+            ))}
+          </div>
+          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+            Trusted by <span className="text-slate-300">500+ Corporations</span> globally
+          </p>
         </div>
       </div>
 
       {/* Right Side: Focus Action Zone */}
-      <div className="flex-1 flex flex-col justify-center items-center p-8 lg:p-24 relative overflow-y-auto">
-        {/* Mobile Logo */}
-        <div className="lg:hidden absolute top-8 left-8 flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl">B</div>
-          <span className="text-xl font-black tracking-tighter text-slate-950">BizFlow</span>
-        </div>
-
-        <div className="w-full max-w-md space-y-12">
+      <div className="flex-1 flex flex-col justify-center items-center p-8 lg:p-12 relative bg-white lg:rounded-l-[4rem] shadow-[-20px_0_60px_rgba(0,0,0,0.5)] z-20">
+        <div className="w-full max-w-md space-y-10 group/form">
           {/* Form Header */}
           <div className="space-y-4">
-            <h1 className="text-4xl font-black text-slate-950 tracking-tighter">Command Access</h1>
-            <p className="text-slate-500 font-medium">Verify your identity to re-establish workspace sync.</p>
+            <div className="lg:hidden flex justify-center mb-8">
+              <div className="w-16 h-16 bg-slate-950 rounded-2xl flex items-center justify-center text-white font-black text-3xl">B</div>
+            </div>
+            <h1 className="text-5xl font-black text-slate-950 tracking-tighter">Login</h1>
+            <p className="text-slate-500 font-medium text-lg leading-relaxed">Enter your credentials to access the command center.</p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="p-5 bg-rose-50 border-l-4 border-rose-500 rounded-xl flex items-center gap-4 text-rose-700 animate-fade-in">
-              <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
+            <div className="p-5 bg-rose-50 border border-rose-100 rounded-3xl flex items-center gap-4 text-rose-700 animate-fade-in">
+              <div className="w-10 h-10 bg-rose-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-rose-200">
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
               <p className="text-xs font-black uppercase tracking-tight">{error}</p>
             </div>
           )}
 
           {/* Form Area */}
-          <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Anti-autofill honeypot fields (hidden) */}
+            <input style={{ display: 'none' }} type="text" name="fake_email" />
+            <input style={{ display: 'none' }} type="password" name="fake_password" />
+
+            <div className="space-y-4">
               {/* Email Input */}
-              <div className="space-y-3 group">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-1 transition-colors group-focus-within:text-indigo-600">
-                  Entity Identifier
+              <div className="space-y-2 group/input">
+                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest px-2 group-focus-within/input:text-indigo-600 transition-colors">
+                  Executive Identity
                 </label>
                 <div className="relative">
                   <input
-                    type="email"
+                    type="text"
+                    name="bf_executive_id"
+                    id="bf_executive_id"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-6 py-5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-8 focus:ring-indigo-500/5 focus:border-indigo-600 focus:bg-white transition-all text-slate-900 font-bold text-lg placeholder-slate-300 shadow-sm"
-                    placeholder="name@bizflow.io"
+                    autoComplete="chrome-off"
+                    className="w-full px-8 py-6 bg-slate-50 border border-slate-100 rounded-[2rem] outline-none focus:ring-[12px] focus:ring-indigo-500/5 focus:border-indigo-600 focus:bg-white transition-all text-slate-900 font-bold text-lg placeholder-slate-300 shadow-inner"
+                    placeholder="email@company.com"
                   />
-                  <div className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300">
-                    <ICONS.Customers className="w-5 h-5" />
+                  <div className="absolute right-8 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within/input:text-indigo-600 transition-colors">
+                    <ICONS.Customers className="w-6 h-6" />
                   </div>
                 </div>
               </div>
 
               {/* Password Input */}
-              <div className="space-y-3 group">
-                <div className="flex justify-between items-center px-1">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] transition-colors group-focus-within:text-indigo-600">
-                    Sovereign Token
+              <div className="space-y-2 group/input">
+                <div className="flex justify-between items-center px-2">
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest group-focus-within/input:text-indigo-600 transition-colors">
+                    Security Protocol
                   </label>
-                  <button type="button" className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-indigo-600 transition-colors">
-                    Request Recovery
+                  <button type="button" className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-indigo-600 transition-colors">
+                    Recovery
                   </button>
                 </div>
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
+                    name="bf_security_cipher"
+                    id="bf_security_cipher"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-6 py-5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-8 focus:ring-indigo-500/5 focus:border-indigo-600 focus:bg-white transition-all text-slate-900 font-bold text-lg placeholder-slate-300 shadow-sm"
-                    placeholder="••••••••••••"
+                    autoComplete="new-password"
+                    className="w-full px-8 py-6 bg-slate-50 border border-slate-100 rounded-[2rem] outline-none focus:ring-[12px] focus:ring-indigo-500/5 focus:border-indigo-600 focus:bg-white transition-all text-slate-900 font-bold text-lg placeholder-slate-300 shadow-inner"
+                    placeholder="Signature Password"
                   />
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 hover:text-indigo-600 transition-colors"
+                    className="absolute right-8 top-1/2 -translate-y-1/2 text-slate-300 hover:text-indigo-600 transition-colors"
                   >
                     {showPassword ? (
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" /></svg>
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" /></svg>
                     ) : (
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                     )}
                   </button>
                 </div>
@@ -175,59 +189,57 @@ const Auth: React.FC<{ onLogin: (email: string, pass: string) => Promise<void> }
             <button
               disabled={isLoggingIn}
               type="submit"
-              className="w-full bg-slate-950 hover:bg-indigo-600 text-white font-black py-6 rounded-[1.5rem] transition-all shadow-2xl shadow-slate-200 flex items-center justify-center gap-4 group relative overflow-hidden"
+              className="w-full bg-slate-950 hover:bg-indigo-600 text-white font-black py-7 rounded-[2.5rem] transition-all duration-500 shadow-2xl shadow-indigo-100 flex items-center justify-center gap-4 group relative overflow-hidden active:scale-[0.98] disabled:opacity-50"
             >
-              <div className={`flex items-center gap-4 transition-all duration-300 ${isLoggingIn ? 'opacity-0 scale-90 translate-y-2' : 'opacity-100 scale-100 translate-y-0'}`}>
-                <span className="text-xs uppercase tracking-[0.4em]">Establish Link</span>
-                <ICONS.Bolt className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+              <div className={`flex items-center gap-4 transition-all duration-500 ${isLoggingIn ? 'opacity-0 scale-90 translate-y-4' : 'opacity-100 scale-100 translate-y-0'}`}>
+                <span className="text-xs uppercase tracking-[0.5em] font-black">Establish Connection</span>
+                <ICONS.Bolt className="w-5 h-5 group-hover:rotate-12 transition-transform duration-500" />
               </div>
 
               {isLoggingIn && (
                 <div className="absolute inset-0 flex items-center justify-center gap-4 animate-fade-in">
-                  <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">
-                    {loginStep === 'verifying' ? 'Verifying Integrity' : 'Syncing Protocol'}
+                  <div className="w-6 h-6 border-3 border-white/20 border-t-white rounded-full animate-spin"></div>
+                  <span className="text-[11px] font-black uppercase tracking-[0.4em]">
+                    {loginStep === 'verifying' ? 'Verifying Integrity' : 'Authorizing Sync'}
                   </span>
                 </div>
               )}
             </button>
           </form>
 
-          {/* Social Auth & Footer */}
-          <div className="space-y-10 pt-4">
-            <div className="flex items-center gap-4">
+          {/* Footer Access */}
+          <div className="pt-8 flex flex-col items-center gap-8">
+            <div className="flex items-center gap-4 w-full">
               <div className="h-px bg-slate-100 flex-1"></div>
-              <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Enterprise Access</span>
+              <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Enterprise SSO</span>
               <div className="h-px bg-slate-100 flex-1"></div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-               <button className="flex items-center justify-center gap-3 py-4 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-all font-black text-[10px] uppercase tracking-widest text-slate-600">
-                  <div className="w-5 h-5 bg-slate-100 rounded-lg flex items-center justify-center text-[10px]">G</div>
-                  Google
-               </button>
-               <button className="flex items-center justify-center gap-3 py-4 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-all font-black text-[10px] uppercase tracking-widest text-slate-600">
-                  <div className="w-5 h-5 bg-slate-100 rounded-lg flex items-center justify-center text-[10px]">M</div>
-                  Microsoft
-               </button>
+            <div className="flex gap-4 w-full">
+              <button className="flex-1 py-5 border border-slate-100 rounded-[1.5rem] hover:bg-slate-50 transition-all flex items-center justify-center">
+                <div className="w-6 h-6 bg-slate-100 rounded-lg flex items-center justify-center text-[10px] font-black">G</div>
+              </button>
+              <button className="flex-1 py-5 border border-slate-100 rounded-[1.5rem] hover:bg-slate-50 transition-all flex items-center justify-center px-4">
+                <div className="w-6 h-6 bg-slate-100 rounded-lg flex items-center justify-center text-[10px] font-black">M</div>
+              </button>
             </div>
 
-            <p className="text-center text-slate-500 font-medium text-sm">
-              Missing from the ecosystem? 
+            <p className="text-slate-500 font-medium text-sm">
+              Not on the platform yet?
               <Link to="/signup" className="ml-2 text-indigo-600 font-black uppercase tracking-widest hover:underline decoration-2 underline-offset-4">
-                Provision Access
+                Join Network
               </Link>
             </p>
           </div>
         </div>
 
-        {/* Global Footer */}
-        <div className="mt-auto pt-20 w-full max-w-md flex justify-between items-center opacity-30 group hover:opacity-100 transition-opacity">
-           <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">&copy; 2025 BIZFLOW HQ</p>
-           <div className="flex gap-4">
-              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Privacy</span>
-              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Terms</span>
-           </div>
+        {/* Legal Meta */}
+        <div className="mt-16 pt-8 w-full max-w-md flex justify-between items-center opacity-40 group hover:opacity-100 transition-opacity">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">&copy; 2025 BIZFLOW HQ</p>
+          <div className="flex gap-6">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest cursor-pointer hover:text-indigo-600">Privacy</span>
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest cursor-pointer hover:text-indigo-600">Terms</span>
+          </div>
         </div>
       </div>
     </div>

@@ -38,6 +38,13 @@ export interface DashboardStats {
   monthlyGrowth: number;
   revenueChart: { month: string; amount: number }[];
   recentTransactions: Transaction[];
+  revenueByCategory: { name: string; value: number }[];
+  acquisitionTrends: { month: string; count: number }[];
+  sparklines: {
+    revenue: number[];
+    customers: number[];
+    transactions: number[];
+  };
 }
 
 export interface AuthState {

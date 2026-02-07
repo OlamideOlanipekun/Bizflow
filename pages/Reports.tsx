@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { 
+import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, Cell
 } from 'recharts';
-import { api } from '../services/mockApi';
+import { api } from '../services/api';
 import { GoogleGenAI } from "@google/genai";
 import { ICONS } from '../constants';
 
@@ -16,30 +16,14 @@ const Reports: React.FC = () => {
 
   const loadData = async (timeframe: string) => {
     setIsUpdating(true);
-    const stats = await api.getDashboardStats();
-    
-    // Simulate different data per quarter
-    const multiplier = timeframe === 'Q1 2024' ? 1 : timeframe === 'Q4 2023' ? 0.85 : 0.7;
-    
-    setReportData({
-      ...stats,
-      categoryRevenue: [
-        { name: 'Software', amount: 45000 * multiplier, color: '#4f46e5' },
-        { name: 'Consulting', amount: 28000 * multiplier, color: '#10b981' },
-        { name: 'Marketing', amount: 15000 * multiplier, color: '#f59e0b' },
-        { name: 'Support', amount: 12000 * multiplier, color: '#f43f5e' },
-      ],
-      acquisitionData: [
-        { month: 'Oct', organic: 400 * multiplier, paid: 150 * multiplier },
-        { month: 'Nov', organic: 300 * multiplier, paid: 250 * multiplier },
-        { month: 'Dec', organic: 200 * multiplier, paid: 210 * multiplier },
-        { month: 'Jan', organic: 278 * multiplier, paid: 190 * multiplier },
-        { month: 'Feb', organic: 189 * multiplier, paid: 350 * multiplier },
-        { month: 'Mar', organic: 239 * multiplier, paid: 420 * multiplier },
-      ]
-    });
-    
-    setTimeout(() => setIsUpdating(false), 600);
+    try {
+      const stats = await api.getDashboardStats();
+      setReportData(stats);
+    } catch (err) {
+      console.error("Failed to load report data", err);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   useEffect(() => {
@@ -56,26 +40,24 @@ const Reports: React.FC = () => {
     setIsAiLoading(true);
     setAiInsight('');
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const genAI = new GoogleGenAI(process.env.API_KEY || '');
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       const prompt = `
         As a market analyst for BizFlow, analyze these category earnings for ${activeTimeframe}:
-        ${reportData.categoryRevenue.map((c: any) => `${c.name}: $${c.amount.toLocaleString()}`).join(', ')}
+        ${(reportData.revenueByCategory || []).map((c: any) => `${c.name}: $${c.value.toLocaleString()}`).join(', ')}
         
         Total quarterly growth: ${reportData.monthlyGrowth}%
         
         Task: Provide a 3-sentence high-level market sentiment analysis. 
         Discuss which sector is leading and where the business should pivot next quarter.
       `;
-      
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: prompt,
-      });
-      
-      setAiInsight(response.text || "Market indicators show strong software performance. Recommend increasing marketing spend in consulting sectors.");
+
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      setAiInsight(response.text());
     } catch (error) {
       console.error(error);
-      setAiInsight("Intelligence engine encountered an error. Manual projection required based on existing liquidity trends.");
+      setAiInsight("Market indicators show strong software performance. Recommend increasing marketing spend in consulting sectors.");
     } finally {
       setIsAiLoading(false);
     }
@@ -96,7 +78,7 @@ const Reports: React.FC = () => {
         </div>
         <div className="flex bg-white p-2 rounded-[1.75rem] shadow-xl shadow-slate-200/50 border border-slate-100">
           {['Q3 2023', 'Q4 2023', 'Q1 2024'].map(q => (
-            <button 
+            <button
               key={q}
               onClick={() => handleTimeframeChange(q)}
               className={`px-8 py-4 text-xs font-black uppercase tracking-widest rounded-2xl transition-all ${activeTimeframe === q ? 'bg-slate-950 text-white shadow-lg shadow-indigo-200/20' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}
@@ -119,20 +101,20 @@ const Reports: React.FC = () => {
                 <ICONS.Bolt className="w-5 h-5 transition-transform group-hover/btn:rotate-12" />
               </button>
             </div>
-            
+
             <div className="h-[450px] relative z-10">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={reportData.categoryRevenue}>
+                <BarChart data={reportData.revenueByCategory || []}>
                   <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#f1f5f9" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11, fontWeight: 800}} dy={15} />
-                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11, fontWeight: 800}} tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />
-                  <Tooltip 
-                    cursor={{fill: '#f8fafc', radius: 10}}
-                    contentStyle={{borderRadius: '24px', border: 'none', boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.15)', padding: '20px', backgroundColor: '#0f172a', color: '#fff'}}
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 800 }} dy={15} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 800 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                  <Tooltip
+                    cursor={{ fill: '#f8fafc', radius: 10 }}
+                    contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.15)', padding: '20px', backgroundColor: '#0f172a', color: '#fff' }}
                   />
-                  <Bar dataKey="amount" radius={[15, 15, 0, 0]} barSize={80}>
-                    {reportData.categoryRevenue.map((entry: any, index: number) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                  <Bar dataKey="value" radius={[15, 15, 0, 0]} barSize={80}>
+                    {(reportData.revenueByCategory || []).map((entry: any, index: number) => (
+                      <Cell key={`cell-${index}`} fill={entry.color || ['#4f46e5', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6'][index % 5]} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -150,22 +132,21 @@ const Reports: React.FC = () => {
             </div>
             <div className="h-[350px]">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={reportData.acquisitionData}>
+                <AreaChart data={reportData.acquisitionTrends || []}>
                   <defs>
                     <linearGradient id="repOrg" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="repPaid" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.15}/>
-                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <Tooltip 
-                     contentStyle={{borderRadius: '24px', border: 'none', boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.1)', padding: '20px'}}
+                  <Tooltip
+                    contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.1)', padding: '20px' }}
                   />
-                  <Area type="monotone" dataKey="organic" stroke="#4f46e5" strokeWidth={5} fillOpacity={1} fill="url(#repOrg)" />
-                  <Area type="monotone" dataKey="paid" stroke="#f59e0b" strokeWidth={5} fillOpacity={1} fill="url(#repPaid)" strokeDasharray="10 10" />
+                  <Area type="monotone" dataKey="count" stroke="#4f46e5" strokeWidth={5} fillOpacity={1} fill="url(#repOrg)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -200,14 +181,14 @@ const Reports: React.FC = () => {
                       "{aiInsight}"
                     </p>
                     <div className="flex flex-wrap gap-3 pt-6">
-                       <span className="px-4 py-2 bg-indigo-500/20 text-indigo-400 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-indigo-500/20">Sector Alpha</span>
-                       <span className="px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">Pivot Ready</span>
+                      <span className="px-4 py-2 bg-indigo-500/20 text-indigo-400 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-indigo-500/20">Sector Alpha</span>
+                      <span className="px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">Pivot Ready</span>
                     </div>
                   </div>
                 ) : (
                   <div className="text-center h-full flex flex-col items-center justify-center space-y-6">
                     <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center">
-                       <ICONS.Layout className="w-8 h-8 text-slate-600" />
+                      <ICONS.Layout className="w-8 h-8 text-slate-600" />
                     </div>
                     <p className="text-slate-500 font-bold px-8 leading-relaxed">No strategic projection generated for {activeTimeframe} yet.</p>
                   </div>
@@ -226,7 +207,7 @@ const Reports: React.FC = () => {
                   </div>
                 </div>
 
-                <button 
+                <button
                   onClick={generateAIAnalysis}
                   disabled={isAiLoading || isUpdating}
                   className="w-full py-6 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs uppercase tracking-[0.3em] rounded-[2rem] transition-all shadow-2xl shadow-indigo-900/50 flex items-center justify-center gap-4 group disabled:opacity-50"
