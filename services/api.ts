@@ -1,6 +1,7 @@
 import { Customer, Transaction, DashboardStats, User } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+console.log('[ApiService] Target URL:', API_URL);
 
 class ApiService {
     private getHeaders() {
