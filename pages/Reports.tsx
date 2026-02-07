@@ -4,7 +4,6 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, Cell
 } from 'recharts';
 import { api } from '../services/api';
-import { GoogleGenAI } from "@google/genai";
 import { ICONS } from '../constants';
 
 const Reports: React.FC = () => {
@@ -40,21 +39,8 @@ const Reports: React.FC = () => {
     setIsAiLoading(true);
     setAiInsight('');
     try {
-      const genAI = new GoogleGenAI(process.env.API_KEY || '');
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      const prompt = `
-        As a market analyst for BizFlow, analyze these category earnings for ${activeTimeframe}:
-        ${(reportData.revenueByCategory || []).map((c: any) => `${c.name}: $${c.value.toLocaleString()}`).join(', ')}
-        
-        Total quarterly growth: ${reportData.monthlyGrowth}%
-        
-        Task: Provide a 3-sentence high-level market sentiment analysis. 
-        Discuss which sector is leading and where the business should pivot next quarter.
-      `;
-
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      setAiInsight(response.text());
+      const insights = await api.getAiInsights(reportData);
+      setAiInsight(insights);
     } catch (error) {
       console.error(error);
       setAiInsight("Market indicators show strong software performance. Recommend increasing marketing spend in consulting sectors.");
