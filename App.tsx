@@ -163,7 +163,7 @@ const Navbar: React.FC<{ user: User | null; onOpenSidebar: () => void }> = ({ us
   }, []);
 
   return (
-    <header className="h-20 bg-white/70 backdrop-blur-2xl border-b border-slate-100 fixed top-0 left-0 lg:left-72 right-0 z-40 flex items-center justify-between px-6 lg:px-10 transition-all duration-300">
+    <header className="h-20 bg-white/70 backdrop-blur-2xl border-b border-slate-100 fixed top-0 left-0 lg:left-72 right-0 z-40 flex items-center justify-between px-4 sm:px-6 lg:px-10 transition-all duration-300">
       <div className="flex items-center gap-4 lg:gap-8 flex-1">
         <button
           onClick={onOpenSidebar}
