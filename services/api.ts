@@ -35,7 +35,9 @@ class ApiService {
 
         if (!res.ok) {
             const errorData = await res.json().catch(() => ({}));
-            throw new Error(errorData.message || 'API Request Failed');
+            // Prioritize error.message from controller if available
+            const errorMessage = errorData.error || errorData.message || 'API Request Failed';
+            throw new Error(errorMessage);
         }
 
         const json = await res.json();
